@@ -3,33 +3,32 @@ import openslide as opsl
 import parameters as parm
 import pandas as pd
 
-def get_slide_ids(file_name):
+def get_slide_ids(filename):
     """
     Load Excel spreadsheet and extract slide IDs for BCL-2 and c-MYC
     """
     # Load pathology data from .xlsx file as a dict of sheets
     print("Loading slide data...")
-    df = pd.read_excel(io=file_name, sheet_name=None)    # pandas DataFrame
+    df = pd.read_excel(filename, None)    # pandas DataFrame
 
-    BCL2_slides=[]
-    cMYC_slides=[]
+    BCL2_slide_id=[]
+    cMYC_slide_id=[]
 
-    # df.keys() contains spreadsheet sheet names
-    for key in df.keys():
-        sheet = df[key]    # can be printed to display full table
+    for sheetname in df.keys():
+        sheet = df[sheetname]    # can be printed to display table contents
 
         col_d = sheet.columns[3]    # columns D and H
         col_h = sheet.columns[7]
 
-        BCL2_slides.append(sheet[col_d][2])    # slide ID (raw image names)
-        cMYC_slides.append(sheet[col_h][2])
+        BCL2_slide_id.append(sheet[col_d][2])    # slide ID (raw image names)
+        cMYC_slide_id.append(sheet[col_h][2])
 
-    return BCL2_slides, cMYC_slides
+    return BCL2_slide_id, cMYC_slide_id
 
-BCL2_slides, cMYC_slides = get_slide_ids("{0}/ALL_REMoDL-B_TMA_ABC_RT.xlsx".format(parm.dir_slide_data))
+abc_BCL2_slide_id, abc_cMYC_slide_id = get_slide_ids("{0}/ALL_REMoDL-B_TMA_ABC_RT.xlsx".format(parm.dir_slide_data))
 
-print("BCL-2 slides: ", BCL2_slides)
-print("c-MYC slides: ", cMYC_slides)
+print("BCL-2 slides: ", abc_BCL2_slide_id)
+print("c-MYC slides: ", abc_cMYC_slide_id)
 
 print("Opening slide object...")
 my_slide = opsl.OpenSlide("{0}/393930.svs".format(parm.dir_slides_raw))  # pointer to slide object

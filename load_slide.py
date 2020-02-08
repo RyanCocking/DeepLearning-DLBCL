@@ -31,13 +31,13 @@ print("BCL-2 slides: ", abc_BCL2_slide_id)
 print("c-MYC slides: ", abc_cMYC_slide_id)
 
 print("Opening slide object...")
-my_slide = opsl.OpenSlide("{0}/393930.svs".format(parm.dir_slides_raw))  # pointer to slide object
+my_slide = opsl.OpenSlide("{0}/393932.svs".format(parm.dir_slides_raw))  # pointer to slide object
 
 print("Reading slide region...")
-slide_image = my_slide.read_region(location=(5000,5000), level=1, size=(1000,1000))  # (x,y) of top-left corner, zoom level, (w,h) pixels
+slide_image = my_slide.read_region(location=(4100,4200), level=0, size=(4000,4000))  # (x,y) of top-left corner, zoom level, (w,h) pixels
 
 print("Saving slide object as PNG...")
-slide_image.save("{0}/slide_test.png".format(parm.dir_figures))  # save slide object as png
+slide_image.save("{0}/slide_test.png".format(parm.dir_slides_cropped))  # save slide object as png
 
 # now we need to find the (x,y) positions of the cores!
 

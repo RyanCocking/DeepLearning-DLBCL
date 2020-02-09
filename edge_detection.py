@@ -1,9 +1,6 @@
 # Edge detection using OpenCV
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
-import png
-import parameters as parm
 
 def detect_edges(in_file, out_file="edges.png", p1=50, p2=200):
     """

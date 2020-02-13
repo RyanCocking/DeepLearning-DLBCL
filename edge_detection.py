@@ -19,19 +19,24 @@ def detect_circles(in_file, out_file="circles.png", p1=50, p2=30, minr=50, maxr=
     Detect circles in an image read from a slide at zoom level 3. Save as a PNG.
     Return circle centres and radii.
 
-    p1, p2: Canny edge detection parameters
-    minr, maxr: Integer radii of circles to detect, in pixels.
+    args
+        p1, p2: Canny edge detection parameters
+        minr, maxr: Integer radii of circles to detect, in pixels.
+
+    returns
+        circles: contains centres and radii of drawn circles
     """
 
     cimg = cv2.imread(in_file)
-    cimg = cv2.medianBlur(cimg, 5)  # Blur to remove noise
-    img = cv2.cvtColor(cimg, cv2.COLOR_BGR2GRAY)  # Algorithm accepts grey images
+    img = cv2.medianBlur(cimg, ksize=13)  # Blur to remove noise (select ksize carefully)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Algorithm accepts grey images
 
     circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, 20,
         param1=p1, param2=p2, minRadius=minr, maxRadius=maxr)
 
     # Will throw complaint here if no circles detected.
 
+    # draw circles on the original unblurred image
     circles = np.uint16(np.around(circles))
     for i in circles[0,:]:
         # draw the outer circle

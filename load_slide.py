@@ -21,11 +21,9 @@ def get_spreadsheet_info(filename):
     returns:
         BCL2_slide_id: N int array, 7-digit slide IDs for BCL-2 staining
         cMYC_slide_id: N int array, 7-digit slide IDs for c-MYC staining
-        core_refs: Nx2xM int array, alphanumeric core references for N slides
+        core_refs: NxMx2 list, alphanumeric core references for N slides
                    of M cores. Both stains use the same references. Indexed as
-                   [slide, col/row, core]
-
-                   note: THIS INDEXING NEEDS TO BE IMPROVED
+                   [slide, core, col/row]
 
     """
     # Load .xlsx file as a dict of sheets
@@ -35,9 +33,6 @@ def get_spreadsheet_info(filename):
     BCL2_slide_id=[]
     cMYC_slide_id=[]
     core_refs = []
-    tumour = []
-    host = []
-    stroma = []
 
     # sheets within a spreadsheet
     for sheetname in df.keys():
@@ -52,13 +47,12 @@ def get_spreadsheet_info(filename):
         col_b = sheet.columns[1] 
         col_c = sheet.columns[2]
 
-        core_cols = np.array(sheet[col_b][4:])
-        core_rows = np.array(sheet[col_c][4:])
+        core_cols = np.array(sheet[col_c][4:])
+        core_rows = np.array(sheet[col_b][4:])
 
-        core_refs.append([core_cols, core_rows])
+        core_refs.append(np.transpose([core_cols, core_rows]))
         
-
-    return BCL2_slide_id, cMYC_slide_id, np.array(core_refs)
+    return BCL2_slide_id, cMYC_slide_id, core_refs
 
 def print_slide_metadata(slide_object):
     """

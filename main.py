@@ -13,9 +13,6 @@ abc_BCL2_slide_id, abc_cMYC_slide_id, abc_core_refs = get_spreadsheet_info(
 
 print("BCL-2 slide IDs: ", abc_BCL2_slide_id[0])
 print("c-MYC slide IDs: ", abc_cMYC_slide_id[0])
-print("ABC core references: ", abc_core_refs[0][0][6])
-
-quit()
 
 # BCL-2
 for slide_id in abc_BCL2_slide_id[0:2]:

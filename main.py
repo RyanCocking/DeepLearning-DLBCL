@@ -11,8 +11,9 @@ print("Obtaining slide IDs of ABC data...")
 abc_BCL2_slide_id, abc_cMYC_slide_id, abc_core_refs = get_spreadsheet_info(
     "{0}/ALL_REMoDL-B_TMA_ABC_RT.xlsx".format(parm.dir_slide_data))
 
-print("BCL-2 slide IDs: ", abc_BCL2_slide_id)
-print("c-MYC slide IDs: ", abc_cMYC_slide_id)
+print("BCL-2 slide IDs: ", abc_BCL2_slide_id[0])
+print("c-MYC slide IDs: ", abc_cMYC_slide_id[0])
+print("ABC core references: ", abc_core_refs[0][0][6])
 
 quit()
 

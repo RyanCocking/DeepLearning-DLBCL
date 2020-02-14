@@ -2,6 +2,7 @@
 import openslide as opsl
 import parameters as parm
 import pandas as pd
+import numpy as np
 
 def get_spreadsheet_info(filename):
     """
@@ -20,8 +21,12 @@ def get_spreadsheet_info(filename):
     returns:
         BCL2_slide_id: N int array, 7-digit slide IDs for BCL-2 staining
         cMYC_slide_id: N int array, 7-digit slide IDs for c-MYC staining
-        core_refs: NxMx2 int array, alphanumeric core references for N slides
-                   of M cores. Indexed per core as [ABC, 123] i.e. [col, row]
+        core_refs: Nx2xM int array, alphanumeric core references for N slides
+                   of M cores. Both stains use the same references. Indexed as
+                   [slide, col/row, core]
+
+                   note: THIS INDEXING NEEDS TO BE IMPROVED
+
     """
     # Load .xlsx file as a dict of sheets
     print("Loading slide data from spreadsheet...")
@@ -47,12 +52,13 @@ def get_spreadsheet_info(filename):
         col_b = sheet.columns[1] 
         col_c = sheet.columns[2]
 
-        print(sheet[col_b][4])
-        print(sheet[col_c][4])
+        core_cols = np.array(sheet[col_b][4:])
+        core_rows = np.array(sheet[col_c][4:])
 
-        #for cores in 
+        core_refs.append([core_cols, core_rows])
+        
 
-    return BCL2_slide_id, cMYC_slide_id, core_refs
+    return BCL2_slide_id, cMYC_slide_id, np.array(core_refs)
 
 def print_slide_metadata(slide_object):
     """

@@ -24,8 +24,8 @@ def detect_circles(in_file, out_file="circles.png", p1=50, p2=30, minr=50, maxr=
         minr, maxr: Integer radii of circles to detect, in pixels.
 
     returns
-        centres: Nx2 float array, circle centres
-        radii: N float array, circle radii
+        centres: Nx2 float array, unordered circle centres
+        radii: N float array, corresponding circle radii
     """
 
     cimg = cv2.imread(in_file)

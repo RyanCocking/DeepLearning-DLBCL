@@ -24,7 +24,8 @@ def detect_circles(in_file, out_file="circles.png", p1=50, p2=30, minr=50, maxr=
         minr, maxr: Integer radii of circles to detect, in pixels.
 
     returns
-        circles: contains centres and radii of drawn circles
+        centres: Nx2 float array, circle centres
+        radii: N float array, circle radii
     """
 
     cimg = cv2.imread(in_file)
@@ -38,14 +39,18 @@ def detect_circles(in_file, out_file="circles.png", p1=50, p2=30, minr=50, maxr=
 
     # draw circles on the original unblurred image
     circles = np.uint16(np.around(circles))
+    centres = []
+    radii = []
     for i in circles[0,:]:
         # draw the outer circle
         cv2.circle(cimg,(i[0],i[1]),i[2],(0,255,0),2)
         # draw the center of the circle
         cv2.circle(cimg,(i[0],i[1]),2,(0,0,255),3)
-
+        
+        centres.append([i[0],i[1]])
+        radii.append(i[2])
 
     cv2.imwrite(out_file, cimg)
     print("Saved PNG to {0}".format(out_file))
 
-    return circles[0,:]
+    return np.array(centres), np.array(radii)

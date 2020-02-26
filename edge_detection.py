@@ -38,7 +38,7 @@ def detect_circles(in_file, out_file="circles.png", p1=50, p2=30, minr=50, maxr=
     # Will throw complaint here if no circles detected.
 
     # draw circles on the original unblurred image
-    circles = np.uint16(np.around(circles))
+    circles = np.array(np.around(circles), dtype='int16')
     centres = []
     radii = []
     for i in circles[0,:]:

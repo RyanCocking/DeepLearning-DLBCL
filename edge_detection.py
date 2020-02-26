@@ -13,17 +13,57 @@ def detect_edges(in_file, out_file="edges.png", p1=50, p2=200):
     cv2.imwrite(out_file, edges)  # Black = space, white = edges
     print("Saved PNG to {0}".format(out_file))
 
+def remove_duplicate_circles(centres, radii):
+    """
+    Fix double-counted sample centres.
+
+    arguments:
+        centres: Nx2 integer array, coordinates of circle centres detected with
+                 the Hough transform
+        radii: N integer array, corresponding radii
+
+    returns:
+        centres array, with double-counts removed
+        corresponding radii
+    """
+
+    indices = []
+    for i in range(centres.shape[0]):
+        for j in range(centres.shape[0]):
+            if i != j:
+
+                print(i, j)
+
+                rad1 = radii[i]
+                rad2 = radii[j]
+                d = np.linalg.norm(centres[j] - centres[i])
+
+                # If the centres are too close, mark for deletion whichever
+                # has the smaller corresponding radius
+                if d < 2*rad1:
+                    # Current
+                    if rad2 <= rad1:
+                        indices.append(i)
+                    # Neighbour
+                    else:
+                        indices.append(j)
+
+        # TODO: Still needs some work
+
+        print(indices)
 
 def detect_circles(in_file, out_file="circles.png", p1=50, p2=30, minr=50, maxr=80):
     """
-    Detect circles in an image read from a slide at zoom level 3. Save as a PNG.
+    Detect circles in an image read from a slide object. Save as a PNG.
     Return circle centres and radii.
 
-    args
+    Default values assume zoom level 3.
+
+    arguments:
         p1, p2: Canny edge detection parameters
         minr, maxr: Integer radii of circles to detect, in pixels.
 
-    returns
+    returns:
         centres: Nx2 float array, unordered circle centres
         radii: N float array, corresponding circle radii
     """
@@ -53,4 +93,9 @@ def detect_circles(in_file, out_file="circles.png", p1=50, p2=30, minr=50, maxr=
     cv2.imwrite(out_file, cimg)
     print("Saved PNG to {0}".format(out_file))
 
-    return np.array(centres), np.array(radii)
+    centres = np.array(centres)
+    radii = np.array(radii)
+
+    remove_duplicate_circles(centres, radii)
+
+    return centres, radii

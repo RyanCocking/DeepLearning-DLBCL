@@ -39,7 +39,7 @@ for slide_id in abc_BCL2_slide_id[:2]:
     centres, radii = detect_circles(
         in_file="{0}/{1}_whole_slide.png".format(parm.dir_figures, slide_id),
         out_file="{0}/{1}_hct_circles.png".format(parm.dir_figures, slide_id),
-        p1=50, p2=30, minr=130, maxr=150)
+        min_dist=2*130, p1=50, p2=30, minr=130, maxr=150)
 
     # Sort centres in-place by y pixel (found on StackOverflow)
     centres.view('uint16,uint16').sort(order=['f1'], axis=0)

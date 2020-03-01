@@ -19,6 +19,8 @@ def remove_duplicate_circles(centres, radii):
     to its neighbour j. Neighbours that are within a distance of 2*radius
     are removed.
 
+    NOTE: Made somewhat obsolete by minD parameter in cv2.HoughCircles()
+
     arguments:
         centres: Nx2 integer numpy array, coordinates of circle centres detected with
                  the Hough transform
@@ -54,7 +56,8 @@ def remove_duplicate_circles(centres, radii):
     return centres, radii
 
 
-def detect_circles(in_file, out_file="circles.png", p1=50, p2=30, minr=50, maxr=80):
+def detect_circles(in_file, out_file="circles.png", min_dist=80, p1=50, p2=30,
+    minr=50, maxr=80):
     """
     Detect circles in an image read from a slide object. Save as a PNG.
     Return circle centres and radii.
@@ -62,8 +65,9 @@ def detect_circles(in_file, out_file="circles.png", p1=50, p2=30, minr=50, maxr=
     Default values assume zoom level 3.
 
     arguments:
+        min_dist: integer, minimum distance between detected circles, in pixels.
         p1, p2: Canny edge detection parameters
-        minr, maxr: Integer radii of circles to detect, in pixels.
+        minr, maxr: integer, radii of circles to detect, in pixels.
 
     returns:
         centres: Nx2 float array, unordered circle centres
@@ -74,7 +78,7 @@ def detect_circles(in_file, out_file="circles.png", p1=50, p2=30, minr=50, maxr=
     img = cv2.medianBlur(cimg, ksize=13)  # Blur to remove noise (select ksize carefully)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Algorithm accepts grey images
 
-    circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, 20,
+    circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=min_dist,
         param1=p1, param2=p2, minRadius=minr, maxRadius=maxr)
 
     # NOTE: Will crash and return error here if no circles detected.
@@ -88,8 +92,6 @@ def detect_circles(in_file, out_file="circles.png", p1=50, p2=30, minr=50, maxr=
 
     centres = np.array(centres)
     radii = np.array(radii)
-
-    centres, radii = remove_duplicate_circles(centres, radii)
 
     for i, c in enumerate(centres):
         # draw the outer circle (on unblurred image)

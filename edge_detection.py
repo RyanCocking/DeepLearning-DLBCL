@@ -85,10 +85,6 @@ def detect_circles(in_file, out_file="circles.png", min_dist=80, p1=50, p2=30,
 
     # NOTE: Will crash and return error here if no circles detected.
 
-    if circles is None:
-        print("ERROR - No circles detected in image. Exiting.")
-        return [-1, -1], [-1]
-
     circles = np.array(np.around(circles), dtype='int16')
     centres = []
     radii = []

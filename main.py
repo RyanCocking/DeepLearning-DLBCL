@@ -41,15 +41,9 @@ for slide_id in abc_BCL2_slide_id[:2]:
     # Find circular samples within an image 
     print("Detecting circles in image...")
     centres, radii = detect_circles(
-        in_file="{0}/{1}_whole_slide.png".format(parm.dir_figures, slide_id),
+        in_file="{0}/{1}_whole_slid.png".format(parm.dir_figures, slide_id),
         out_file="{0}/{1}_hct_circles.png".format(parm.dir_figures, slide_id),
         min_dist=2*130, p1=50, p2=30, minr=130, maxr=150)
-
-    # Skip current slide if no circles detected
-    if centres[0][0] == -1 and radii[0] == -1:
-        print("Closing slide {0} object...".format(slide_id))
-        print("")
-        continue
 
     # Sort centres in-place by y pixel (found on StackOverflow)
     centres.view('uint16,uint16').sort(order=['f1'], axis=0)

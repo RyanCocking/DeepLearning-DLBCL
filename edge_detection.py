@@ -53,7 +53,7 @@ def remove_duplicate_circles(centres, radii):
     centres = np.delete(centres, indices, axis=0)
     radii = np.delete(radii, indices)
 
-    return centres, radii
+    return centres[:], radii[:]
 
 
 def detect_circles(in_file, out_file="circles.png", min_dist=80, p1=50, p2=30,
@@ -66,7 +66,9 @@ def detect_circles(in_file, out_file="circles.png", min_dist=80, p1=50, p2=30,
 
     arguments:
         min_dist: integer, minimum distance between detected circles, in pixels.
-        p1, p2: Canny edge detection parameters
+        p1: integer, gradient value for edge detection
+        p2: integer, accumulator threshold for HOUGH_GRADIENT method. A smaller
+            value means more circles (including false ones) are detected.
         minr, maxr: integer, radii of circles to detect, in pixels.
 
     returns:
@@ -82,6 +84,10 @@ def detect_circles(in_file, out_file="circles.png", min_dist=80, p1=50, p2=30,
         param1=p1, param2=p2, minRadius=minr, maxRadius=maxr)
 
     # NOTE: Will crash and return error here if no circles detected.
+
+    if circles is None:
+        print("ERROR - No circles detected in image. Exiting.")
+        return [-1, -1], [-1]
 
     circles = np.array(np.around(circles), dtype='int16')
     centres = []
@@ -102,4 +108,4 @@ def detect_circles(in_file, out_file="circles.png", min_dist=80, p1=50, p2=30,
     cv2.imwrite(out_file, cimg)
     print("Saved PNG to {0}".format(out_file))
 
-    return centres, radii
+    return centres[:], radii[:]

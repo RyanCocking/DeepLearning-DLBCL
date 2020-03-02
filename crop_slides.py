@@ -2,6 +2,8 @@
 # Later: slide pre-processing routines
 import cv2
 import numpy as np
+import math
+import openslide as opsl
 
 def compute_row_gradient(row):
     """
@@ -70,7 +72,40 @@ def create_grid(centres, sample_radius, width, height):
     m_mean2 = np.mean(m[np.where(abs(m) < 1.5*abs(m_mean1))])
 
 
-def extract_sample():
+def extract_sample_images(centre, radius, img_size, mag_factor, dir_path,
+    slide_id, sample_ref):
     """
-    Bound a circular sample in a square box, then save as a PNG file.
+    Inscribe a square region within a circular sample, then extract square
+    images from it.
     """
+
+    centre = np.multiply(centre, mag_factor)
+    centre = np.array(centre, dtype='int32')
+    radius *= mag_factor
+    radius = int(round(radius))
+
+    # Inscribe square within sample
+    x_offset = int(-radius*np.cos(0.25*np.pi))
+    y_offset = int(radius*np.sin(0.25*np.pi))
+    sq_size = int(math.sqrt(2.0)*radius)
+    sq_count = int(math.floor((sq_size*sq_size) / (img_size*img_size)))
+    dim = int(math.floor(sq_size / img_size))
+
+    k = 0
+    for i in range(dim):
+        for j in range(dim):
+            if k <= sq_count:
+                # Window to scan over inscribed square region
+                cx = (i+1)*(centre[0] + x_offset)
+                cy = (i+2)*(centre[1] + y_offset)
+                print(cx, cy)
+                continue
+                # Read and save window as PNG
+                slide_image = my_slide.read_region(location=(cx, cy)
+                    level=0, size=(img_size, img_size))
+                filename="output_{0}_{1}".format(i, j)
+                slide_image.save("{0}/{1}.svs".format(dir_path, filename))
+
+                k += 1
+
+

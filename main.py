@@ -5,7 +5,7 @@ import numpy as np
 import parameters as parm
 from load_slide import get_spreadsheet_info, print_slide_metadata
 from edge_detection import detect_circles
-from crop_slides import create_grid
+from crop_slides import create_grid, extract_sample_images
 
 # Slide IDs of ABC gene
 print("Obtaining slide IDs of ABC data...")
@@ -19,7 +19,7 @@ print("")
 for slide_id in abc_BCL2_slide_id[:2]:
 
     # Pointer to slide object
-    print("Opening slide {0} object...".format(slide_id))
+    print("Opening whole slide object {0}...".format(slide_id))
     my_slide = opsl.OpenSlide("{0}/{1}.svs".format(parm.dir_slides_raw, slide_id))
 
     print("Reading slide region...")
@@ -50,12 +50,19 @@ for slide_id in abc_BCL2_slide_id[:2]:
         min_dist=2*parm.hct_minr, p1=parm.canny_p1, p2=parm.canny_p2,
         minr=parm.hct_minr, maxr=parm.hct_maxr)
 
-    # Sort centres in-place by y pixel (found on StackOverflow)
-    centres.view('uint16,uint16').sort(order=['f1'], axis=0)
+    mean_radius = np.mean(radii)
 
+    # Magnification factor
+    mag = float(
+        my_slide.properties["openslide.level[{0}].downsample".format(zoom)])
 
+    # Sort centres by x coordinate (?) --> used in grid creation
+    # centres.view('uint16,uint16').sort(order=['f1'], axis=0)
 
-    print("Closing slide {0} object...".format(slide_id))
+    for i, c in enumerate(centres):
+        extract_sample_images(c, radii[i], parm.image_dim, mag)
+   
+    print("Closing whole slide object {0}...".format(slide_id))
     print("")
     my_slide.close()
 

@@ -105,8 +105,8 @@ def extract_sample_images(centre, radius, img_size, mag_factor, dir_path,
 
     # Extract images from sample
     k = 0
-    for i in range(dim):
-        for j in range(dim):
+    for j in range(dim):
+        for i in range(dim):
             if k <= sq_count:
                 # Window to scan over inscribed square region
                 x = i*img_size + cx
@@ -114,8 +114,8 @@ def extract_sample_images(centre, radius, img_size, mag_factor, dir_path,
                 # Read and save window as PNG
                 slide_image = slide_object.read_region(location=(x, y), 
                     level=0, size=(img_size, img_size))
-                filename="output_id{0}_ref{1}_i{2}_j{3}".format(slide_id,
-                    sample_ref, i, j)
+                filename="output_id{0}_ref{1}_j{2}_i{3}".format(slide_id,
+                    sample_ref, j, i)
                 slide_image.save("{0}/{1}.png".format(dir_path, filename))
 
                 # NOTE: potential issue with 1-pixel overlap between adjacent

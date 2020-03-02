@@ -60,10 +60,13 @@ for slide_id in abc_BCL2_slide_id[:2]:
     # centres.view('uint16,uint16').sort(order=['f1'], axis=0)
 
     for i, c in enumerate(centres):
-        extract_sample_images(c, radii[i], parm.image_dim, mag)
+        extract_sample_images(c, radii[i], parm.image_dim, mag,
+        parm.dir_slides_cropped, slide_id, i, my_slide)
    
     print("Closing whole slide object {0}...".format(slide_id))
     print("")
     my_slide.close()
+
+    quit()
 
 print("Done")

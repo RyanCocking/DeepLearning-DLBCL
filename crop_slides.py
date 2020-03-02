@@ -73,11 +73,14 @@ def create_grid(centres, sample_radius, width, height):
 
 
 def extract_sample_images(centre, radius, img_size, mag_factor, dir_path,
-    slide_id, sample_ref):
+    slide_id, sample_ref, slide_object):
     """
     Inscribe a square region within a circular sample, then extract square
     images from it.
     """
+
+    print("Extracting images from sample {0} in slide {1}".format(sample_ref, 
+        slide_id))
 
     centre = np.multiply(centre, mag_factor)
     centre = np.array(centre, dtype='int32')
@@ -87,25 +90,37 @@ def extract_sample_images(centre, radius, img_size, mag_factor, dir_path,
     # Inscribe square within sample
     x_offset = int(-radius*np.cos(0.25*np.pi))
     y_offset = int(radius*np.sin(0.25*np.pi))
+    cx = centre[0] + x_offset
+    cy = centre[1] - y_offset
     sq_size = int(math.sqrt(2.0)*radius)
     sq_count = int(math.floor((sq_size*sq_size) / (img_size*img_size)))
     dim = int(math.floor(sq_size / img_size))
 
+    # Save whole sample image as PNG
+    slide_image = slide_object.read_region(location=(cx, cy), level=0,
+        size=(sq_size, sq_size))
+    filename="whole_sample_id{0}_ref{1}".format(slide_id, sample_ref)
+    slide_image.save("{0}/{1}.png".format(dir_path, filename))
+    print("Whole sample image saved to {0}/{1}.png".format(dir_path, filename))
+
+    # Extract images from sample
     k = 0
-    for i in range(dim):
-        for j in range(dim):
+    for j in range(dim):
+        for i in range(dim):
             if k <= sq_count:
                 # Window to scan over inscribed square region
-                cx = (i+1)*(centre[0] + x_offset)
-                cy = (i+2)*(centre[1] + y_offset)
-                print(cx, cy)
-                continue
+                x = i*img_size + cx
+                y = j*img_size + cy
                 # Read and save window as PNG
-                slide_image = my_slide.read_region(location=(cx, cy)
+                slide_image = slide_object.read_region(location=(x, y), 
                     level=0, size=(img_size, img_size))
-                filename="output_{0}_{1}".format(i, j)
-                slide_image.save("{0}/{1}.svs".format(dir_path, filename))
+                filename="output_id{0}_ref{1}_i{2}_j{3}".format(slide_id,
+                    sample_ref, i, j)
+                slide_image.save("{0}/{1}.png".format(dir_path, filename))
 
+                # NOTE: potential issue with 1-pixel overlap between adjacent
+                # images?
                 k += 1
-
+    
+    print("{0} images saved to {1}".format(k, dir_path))
 

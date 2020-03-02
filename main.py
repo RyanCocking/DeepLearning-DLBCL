@@ -23,12 +23,16 @@ for slide_id in abc_BCL2_slide_id[:2]:
     my_slide = opsl.OpenSlide("{0}/{1}.svs".format(parm.dir_slides_raw, slide_id))
 
     print("Reading slide region...")
-    zoom = 2
+    zoom = parm.default_zoom
 
     slide_px_width  = int(
         my_slide.properties["openslide.level[{0}].width".format(zoom)]) 
     slide_px_height = int(
         my_slide.properties["openslide.level[{0}].height".format(zoom)])
+
+    # microns per pixel
+    mpp = float(my_slide.properties["openslide.mpp-x"])
+    print("Microns per pixel = {0:.3f}".format(mpp))
 
     slide_image = my_slide.read_region(location=(0, 0), level=zoom, 
         size=(slide_px_width, slide_px_height))    
@@ -43,7 +47,8 @@ for slide_id in abc_BCL2_slide_id[:2]:
     centres, radii = detect_circles(
         in_file="{0}/{1}_whole_slide.png".format(parm.dir_figures, slide_id),
         out_file="{0}/{1}_hct_circles.png".format(parm.dir_figures, slide_id),
-        min_dist=2*130, p1=50, p2=30, minr=130, maxr=150)
+        min_dist=2*parm.hct_minr, p1=parm.canny_p1, p2=parm.canny_p2,
+        minr=parm.hct_minr, maxr=parm.hct_maxr)
 
     # Sort centres in-place by y pixel (found on StackOverflow)
     centres.view('uint16,uint16').sort(order=['f1'], axis=0)

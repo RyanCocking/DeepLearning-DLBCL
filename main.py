@@ -53,10 +53,7 @@ for slide_id in abc_BCL2_slide_id[:2]:
     # Sort centres in-place by y pixel (found on StackOverflow)
     centres.view('uint16,uint16').sort(order=['f1'], axis=0)
 
-    # Generate a rectangular grid based on detected sample centres, to account
-    # for undetected samples
 
-    create_grid(centres, 75, 7, 7)
 
     print("Closing slide {0} object...".format(slide_id))
     print("")

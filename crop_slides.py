@@ -30,6 +30,8 @@ def create_grid(centres, sample_radius, width, height):
     centres for a slide and generate a rectangular grid that includes every 
     sample.
 
+    NOTE: unfinished
+
     arguments:
         centres: Nx2 integer array, sample centres sorted by y column (pixels)
         sample_radius: integer, approximate radius of every sample (pixels)

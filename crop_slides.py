@@ -105,8 +105,8 @@ def extract_sample_images(centre, radius, img_size, mag_factor, dir_path,
 
     # Extract images from sample
     k = 0
-    for j in range(dim):
-        for i in range(dim):
+    for i in range(dim):
+        for j in range(dim):
             if k <= sq_count:
                 # Window to scan over inscribed square region
                 x = i*img_size + cx

@@ -34,6 +34,7 @@ for slide_id in abc_BCL2_slide_id[:2]:
     mpp = float(my_slide.properties["openslide.mpp-x"])
     print("Microns per pixel = {0:.3f}".format(mpp))
 
+    # Read and save whole slide image
     slide_image = my_slide.read_region(location=(0, 0), level=zoom, 
         size=(slide_px_width, slide_px_height))    
 
@@ -50,23 +51,21 @@ for slide_id in abc_BCL2_slide_id[:2]:
         min_dist=2*parm.hct_minr, p1=parm.canny_p1, p2=parm.canny_p2,
         minr=parm.hct_minr, maxr=parm.hct_maxr)
 
-    mean_radius = np.mean(radii)
-
     # Magnification factor
     mag = float(
         my_slide.properties["openslide.level[{0}].downsample".format(zoom)])
 
-    # Sort centres by x coordinate (?) --> used in grid creation
-    # centres.view('uint16,uint16').sort(order=['f1'], axis=0)
-
+    # Extract images for deep learning input
+    print("Extracting images from samples...")
+    num_images = 0
     for i, c in enumerate(centres):
-        extract_sample_images(c, radii[i], parm.image_dim, mag,
-        parm.dir_slides_cropped, slide_id, i, my_slide)
-   
+        num_images += extract_sample_images(c, radii[i], parm.image_dim, mag,
+            parm.dir_slides_cropped, slide_id, i, my_slide)
+        print("Sample {0} of {1}".format(i, centres.shape[0]), end="\r")
+
+    print("Extracted {0} images".format(num_images))
     print("Closing whole slide object {0}...".format(slide_id))
     print("")
     my_slide.close()
-
-    quit()
 
 print("Done")

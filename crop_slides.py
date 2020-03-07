@@ -79,9 +79,6 @@ def extract_sample_images(centre, radius, img_size, mag_factor, dir_path,
     images from it.
     """
 
-    print("Extracting images from sample {0} in slide {1}".format(sample_ref, 
-        slide_id))
-
     centre = np.multiply(centre, mag_factor)
     centre = np.array(centre, dtype='int32')
     radius *= mag_factor
@@ -101,7 +98,6 @@ def extract_sample_images(centre, radius, img_size, mag_factor, dir_path,
         size=(sq_size, sq_size))
     filename="whole_sample_id{0}_ref{1}".format(slide_id, sample_ref)
     slide_image.save("{0}/{1}.png".format(dir_path, filename))
-    print("Whole sample image saved to {0}/{1}.png".format(dir_path, filename))
 
     # Extract images from sample
     k = 0
@@ -119,8 +115,8 @@ def extract_sample_images(centre, radius, img_size, mag_factor, dir_path,
                 slide_image.save("{0}/{1}.png".format(dir_path, filename))
 
                 # NOTE: potential issue with 1-pixel overlap between adjacent
-                # images?
+                # images? Answer: no, the images tesselate nicely.
                 k += 1
     
-    print("{0} images saved to {1}".format(k, dir_path))
+    return k
 

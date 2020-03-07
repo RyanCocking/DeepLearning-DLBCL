@@ -108,11 +108,11 @@ def extract_sample_images(centre, radius, img_size, mag_factor, dir_path,
                 x = i*img_size + cx
                 y = j*img_size + cy
                 # Read and save window as PNG
-                slide_image = slide_object.read_region(location=(x, y), 
+                img = slide_object.read_region(location=(x, y), 
                     level=0, size=(img_size, img_size))
                 filename="output_id{0}_ref{1}_j{2}_i{3}".format(slide_id,
                     sample_ref, j, i)
-                slide_image.save("{0}/{1}.png".format(dir_path, filename))
+                img.convert("LA").save("{0}/{1}.png".format(dir_path, filename))
 
                 # NOTE: potential issue with 1-pixel overlap between adjacent
                 # images? Answer: no, the images tesselate nicely.

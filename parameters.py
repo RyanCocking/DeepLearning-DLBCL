@@ -15,4 +15,4 @@ canny_p2 = 30
 hct_minr = 130    # Hough circle transform radii
 hct_maxr = 150    # at zoom=2, minr=130 and maxr=150
 
-image_dim = 200    # Size of square image for learning data, pixels
+image_dim = 448    # Size of square image for learning data, pixels

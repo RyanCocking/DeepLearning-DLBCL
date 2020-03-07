@@ -59,9 +59,9 @@ for slide_id in abc_BCL2_slide_id[:2]:
     print("Extracting images from samples...")
     num_images = 0
     for i, c in enumerate(centres):
+        print("Sample {0} of {1}".format(i+1, centres.shape[0]), end="\r")
         num_images += extract_sample_images(c, radii[i], parm.image_dim, mag,
             parm.dir_slides_cropped, slide_id, i, my_slide)
-        print("Sample {0} of {1}".format(i, centres.shape[0]), end="\r")
 
     print("Extracted {0} images".format(num_images))
     print("Closing whole slide object {0}...".format(slide_id))

@@ -13,17 +13,26 @@ def detect_edges(in_file, out_file="edges.png", p1=50, p2=200):
     cv2.imwrite(out_file, edges)  # Black = space, white = edges
     print("Saved PNG to {0}".format(out_file))
 
-def detect_background(in_file, out_file, bg_grey_value, min_area, max_area):
+def detect_background(BGR_img, bg_grey_val, min_area, max_area):
     """
-    Detect large regions of off-white background colour in an image.
+    Detect large regions of off-white background colour in a colour image.
 
-    Currently accepts colour image.
+    arguments:
+        BGR_img: (B, G, R) image file obtained by reading a PNG file with
+                 the cv2.imread() method, or by converting a PIL image
+                 from the (R, G, B) format.
+        bg_grey_val: Greyscale value of the background colour
+        min_area, max_area: pixel range in which contour detection occurs
+
+    returns:
+        has_bg: Boolean, returns True if any contours are detected.
     """
 
     has_bg = False
 
-    img = cv2.imread(in_file)
-    grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # BGR_img = cv2.imread(in_file)
+
+    grey = cv2.cvtColor(BGR_img, cv2.COLOR_BGR2GRAY)
     ret, grey = cv2.threshold(grey, bg_grey_value, 255, cv2.THRESH_BINARY)
     mask = np.zeros(grey.shape, np.uint8)
 
@@ -31,10 +40,10 @@ def detect_background(in_file, out_file, bg_grey_value, min_area, max_area):
     for cnt in contours:
         if min_area < cv2.contourArea(cnt) < max_area:
             has_bg = True
-            cv2.drawContours(img, [cnt], 0, (0,255,0), 2)
-            cv2.drawContours(mask, [cnt], 0, 255, -1)
-
-    cv2.imwrite(out_file, mask)
+            # cv2.drawContours(BGR_img, [cnt], 0, (0,255,0), 2)
+            # cv2.drawContours(mask, [cnt], 0, 255, -1)
+    
+    # cv2.imwrite(out_file, grey)
 
     return has_bg
 

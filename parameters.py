@@ -11,9 +11,9 @@ dir_slide_data = "{0}/slide_data".format(dir_main)    # slide info spreadsheets
 default_zoom = 2    # OpenSlide zoom level
 canny_p1 = 50    # Circle detection Canny parameters
 canny_p2 = 30
-hct_minr = 130    # Hough circle transform radii
-hct_maxr = 150    # at zoom=2, minr=130 and maxr=150
+hct_minr = 130    # Hough circle transform radii at default_zoom=2
+hct_maxr = 150
 image_dim = 448    # Size of square image for learning data, pixels
 bg_gs_val = 230    # Greyscale value of the slide background colour
-min_bg_area = int(1e4)    # Pixel area range of background colour to detect
-max_bg_area = int(9e6)    # in samples images
+min_bg_area = int(0.01*image_dim**2)    # Pixel area range of background contours
+max_bg_area = int(image_dim**2)         # to detect in square images

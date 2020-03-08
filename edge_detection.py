@@ -30,10 +30,8 @@ def detect_background(BGR_img, bg_grey_val, min_area, max_area):
 
     has_bg = False
 
-    # BGR_img = cv2.imread(in_file)
-
     grey = cv2.cvtColor(BGR_img, cv2.COLOR_BGR2GRAY)
-    ret, grey = cv2.threshold(grey, bg_grey_value, 255, cv2.THRESH_BINARY)
+    ret, grey = cv2.threshold(grey, bg_grey_val, 255, cv2.THRESH_BINARY)
     mask = np.zeros(grey.shape, np.uint8)
 
     contours, hier = cv2.findContours(grey, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
@@ -43,8 +41,6 @@ def detect_background(BGR_img, bg_grey_val, min_area, max_area):
             # cv2.drawContours(BGR_img, [cnt], 0, (0,255,0), 2)
             # cv2.drawContours(mask, [cnt], 0, 255, -1)
     
-    # cv2.imwrite(out_file, grey)
-
     return has_bg
 
 def remove_duplicate_circles(centres, radii):

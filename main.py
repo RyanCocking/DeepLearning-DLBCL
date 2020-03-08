@@ -24,20 +24,18 @@ for slide_id in abc_BCL2_slide_id[:2]:
 
     print("Reading slide region...")
     zoom = parm.default_zoom
-
     slide_px_width  = int(
         my_slide.properties["openslide.level[{0}].width".format(zoom)]) 
     slide_px_height = int(
         my_slide.properties["openslide.level[{0}].height".format(zoom)])
 
-    # microns per pixel
+    # Microns per pixel
     mpp = float(my_slide.properties["openslide.mpp-x"])
     print("Microns per pixel = {0:.3f}".format(mpp))
 
     # Read and save whole slide image
     slide_image = my_slide.read_region(location=(0, 0), level=zoom, 
         size=(slide_px_width, slide_px_height))    
-
     slide_image.save("{0}/{1}_whole_slide.png".format(
         parm.dir_figures, slide_id))
     print("Saved PNG to {0}/{1}_whole_slide.png".format(
@@ -55,24 +53,21 @@ for slide_id in abc_BCL2_slide_id[:2]:
     mag = float(
         my_slide.properties["openslide.level[{0}].downsample".format(zoom)])
 
-    print("Detecting background colour in sample image...")
-    discard = detect_background(
-        in_file="{0}/whole_sample_id393949_ref14.png".format(parm.dir_slides_cropped),
-        out_file="{0}/whitespace.png".format(parm.dir_figures),
-        bg_grey_value=230, min_area=10000, max_area=9000000)
-
-    print(discard)
-
-    quit()
-
     # Extract images for deep learning input
     print("Extracting images from samples...")
     num_images = 0
+    num_discards = 0
     for i, c in enumerate(centres):
         print("Sample {0} of {1}".format(i+1, centres.shape[0]), end="\r")
-        num_images += extract_sample_images(c, radii[i], parm.image_dim, mag,
-            parm.dir_slides_cropped, slide_id, i, my_slide)
+        j, k = extract_sample_images(c, radii[i], mag, parm.image_dim, slide_id,
+        i, parm.dir_slides_cropped, my_slide, True, detect_background,
+        (parm.bg_gs_val, parm.min_bg_area, parm.max_bg_area))
+
+        num_images += j
+        num_discards += k
+
     print("Extracted {0} images".format(num_images))
+    print("{0} images discarded".format(num_discards))
 
     print("Closing whole slide object {0}...".format(slide_id))
     print("")

@@ -72,8 +72,8 @@ def create_grid(centres, sample_radius, width, height):
     m_mean2 = np.mean(m[np.where(abs(m) < 1.5*abs(m_mean1))])
 
 
-def extract_sample_images(centre, radius, img_size, mag_factor, dir_path,
-    slide_id, sample_ref, slide_object):
+def extract_sample_images(centre, radius, mag_factor, img_size, slide_id,
+    sample_ref, dir_path, slide_object, grey_out, bg_func, bg_args):
     """
     Inscribe a square region within a circular sample, then extract square
     images from it.
@@ -93,30 +93,36 @@ def extract_sample_images(centre, radius, img_size, mag_factor, dir_path,
     sq_count = int(math.floor((sq_size*sq_size) / (img_size*img_size)))
     dim = int(math.floor(sq_size / img_size))
 
-    # Save whole sample image as PNG
+    # Save square sample image as PNG
     slide_image = slide_object.read_region(location=(cx, cy), level=0,
         size=(sq_size, sq_size))
-    filename="whole_sample_id{0}_ref{1}".format(slide_id, sample_ref)
+    filename="id{0}_ref{1}_sample".format(slide_id, sample_ref)
     slide_image.save("{0}/{1}.png".format(dir_path, filename))
 
     # Extract images from sample
-    k = 0
+    num_images = 0
+    num_discards = 0
     for j in range(dim):
         for i in range(dim):
-            if k <= sq_count:
+            if num_images <= sq_count:
                 # Window to scan over inscribed square region
                 x = i*img_size + cx
                 y = j*img_size + cy
-                # Read and save window as PNG
+
                 img = slide_object.read_region(location=(x, y), 
                     level=0, size=(img_size, img_size))
-                filename="output_id{0}_ref{1}_j{2}_i{3}".format(slide_id,
-                    sample_ref, j, i)
-                img.convert("LA").save("{0}/{1}.png".format(dir_path, filename))
+                BGR_img = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
+                discard = bg_func(BGR_img, *bg_args)
 
-                # NOTE: potential issue with 1-pixel overlap between adjacent
-                # images? Answer: no, the images tesselate nicely.
-                k += 1
+                if discard is False:
+                    filename = "id{0}_ref{1}_j{2}_i{3}_output".format(
+                        slide_id, sample_ref, j, i)
+                    if grey_out is True:
+                        img = img.convert("LA")
+                    img.save("{0}/{1}.png".format(dir_path, filename))
+                    num_images += 1
+                else:
+                    num_discards += 1
     
-    return k
+    return num_images, num_discards
 

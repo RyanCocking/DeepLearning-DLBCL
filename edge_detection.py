@@ -13,6 +13,31 @@ def detect_edges(in_file, out_file="edges.png", p1=50, p2=200):
     cv2.imwrite(out_file, edges)  # Black = space, white = edges
     print("Saved PNG to {0}".format(out_file))
 
+def detect_background(in_file, out_file, bg_grey_value, min_area, max_area):
+    """
+    Detect large regions of off-white background colour in an image.
+
+    Currently accepts colour image.
+    """
+
+    has_bg = False
+
+    img = cv2.imread(in_file)
+    grey = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    ret, grey = cv2.threshold(grey, bg_grey_value, 255, cv2.THRESH_BINARY)
+    mask = np.zeros(grey.shape, np.uint8)
+
+    contours, hier = cv2.findContours(grey, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    for cnt in contours:
+        if min_area < cv2.contourArea(cnt) < max_area:
+            has_bg = True
+            cv2.drawContours(img, [cnt], 0, (0,255,0), 2)
+            cv2.drawContours(mask, [cnt], 0, 255, -1)
+
+    cv2.imwrite(out_file, mask)
+
+    return has_bg
+
 def remove_duplicate_circles(centres, radii):
     """
     Fix over-counted sample centres by comparing distances from sample i
@@ -77,7 +102,7 @@ def detect_circles(in_file, out_file="circles.png", min_dist=80, p1=50, p2=30,
     """
 
     cimg = cv2.imread(in_file)
-    img = cv2.medianBlur(cimg, ksize=13)  # Blur to remove noise (select ksize carefully)
+    img = cv2.medianBlur(cimg, ksize=13)  # Blur to remove noise (k = aperture size)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Algorithm accepts grey images
 
     circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, minDist=min_dist,

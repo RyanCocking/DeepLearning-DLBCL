@@ -4,7 +4,7 @@ import numpy as np
 
 import parameters as parm
 from load_slide import get_spreadsheet_info, print_slide_metadata
-from edge_detection import detect_circles
+from edge_detection import detect_circles, detect_background
 from crop_slides import create_grid, extract_sample_images
 
 # Slide IDs of ABC gene
@@ -55,6 +55,16 @@ for slide_id in abc_BCL2_slide_id[:2]:
     mag = float(
         my_slide.properties["openslide.level[{0}].downsample".format(zoom)])
 
+    print("Detecting background colour in sample image...")
+    discard = detect_background(
+        in_file="{0}/whole_sample_id393949_ref14.png".format(parm.dir_slides_cropped),
+        out_file="{0}/whitespace.png".format(parm.dir_figures),
+        bg_grey_value=230, min_area=10000, max_area=9000000)
+
+    print(discard)
+
+    quit()
+
     # Extract images for deep learning input
     print("Extracting images from samples...")
     num_images = 0
@@ -62,8 +72,8 @@ for slide_id in abc_BCL2_slide_id[:2]:
         print("Sample {0} of {1}".format(i+1, centres.shape[0]), end="\r")
         num_images += extract_sample_images(c, radii[i], parm.image_dim, mag,
             parm.dir_slides_cropped, slide_id, i, my_slide)
-
     print("Extracted {0} images".format(num_images))
+
     print("Closing whole slide object {0}...".format(slide_id))
     print("")
     my_slide.close()

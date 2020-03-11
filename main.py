@@ -7,7 +7,7 @@ import os
 import parameters as parm
 from load_slide import get_spreadsheet_info, print_slide_metadata
 from edge_detection import detect_circles, detect_background
-from crop_slides import create_grid, extract_sample_images
+from crop_slides import extract_sample_images
 
 def setup_dir(path):
     try:

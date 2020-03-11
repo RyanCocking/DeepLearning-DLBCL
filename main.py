@@ -22,18 +22,19 @@ if gene != "ABC" and gene != "GCB":
 
 print("Setting up output directories...")
 setup_dir(parm.dir_figures)
-setup_dir(parm.dir_image_data)
+setup_dir("{0}/{1}".format(parm.dir_image_data, gene))
 
 # Obtain slide IDs
 print("Obtaining slide IDs of {0:s} data...".format(gene))
 BCL2_slide_id, cMYC_slide_id, sample_refs = get_spreadsheet_info(
     "{0:s}/ALL_REMoDL-B_TMA_{1:s}_RT.xlsx".format(parm.dir_slide_info, gene))
 
-print("BCL-2 slide IDs:   ", BCL2_slide_id[:])
-print("c-Myc slide IDs:   ", cMYC_slide_id[:])
+print("BCL2 slide IDs:   ", BCL2_slide_id[:])
+print("cMYC slide IDs:   ", cMYC_slide_id[:])
 
+stain = "BCL2"
 # Loop over two slides of BCL-2
-for slide_id in BCL2_slide_id[:2]:
+for slide_id in BCL2_slide_id[:]:
 
     # Pointer to slide object
     print("Opening whole slide object {0}...".format(slide_id))
@@ -76,9 +77,9 @@ for slide_id in BCL2_slide_id[:2]:
     num_discards = 0
     for i, c in enumerate(centres):
         print("Sample {0} of {1}".format(i+1, centres.shape[0]), end="\r")
-        j, k = extract_sample_images(c, radii[i], mag, parm.image_dim, slide_id,
-        i, "{0}/{1}".format(parm.dir_image_data, gene), my_slide,
-        parm.gs_output, detect_background,
+        j, k = extract_sample_images(c, radii[i], mag, parm.image_dim, gene,
+        stain, slide_id, i, "{0}/{1}".format(parm.dir_image_data, gene), 
+        my_slide, parm.gs_output, detect_background,
         (parm.bg_gs_val, parm.min_bg_area, parm.max_bg_area))
 
         num_images += j

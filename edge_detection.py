@@ -76,7 +76,7 @@ def remove_duplicate_circles(centres, radii):
                     else:
                         indices.append(j)
 
-    # Account for 3 or more circles near the same sample (NOTE: quick fix)
+    # Account for 3 or more circles near the same sample
     indices = np.unique(indices)
 
     # Delete marked elements

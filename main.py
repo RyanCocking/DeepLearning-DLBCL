@@ -2,21 +2,32 @@ import openslide as opsl
 import cv2
 import numpy as np
 import sys
+import os
 
 import parameters as parm
 from load_slide import get_spreadsheet_info, print_slide_metadata
 from edge_detection import detect_circles, detect_background
 from crop_slides import create_grid, extract_sample_images
 
+def setup_dir(path):
+    try:
+        os.mkdir(path)
+    except FileExistsError:
+        pass
+
 gene = sys.argv[1]
-if gene != "ABC" or gene != "GCB":
+if gene != "ABC" and gene != "GCB":
     print("ERROR - Invalid input argument")
     quit()
 
+print("Setting up output directories...")
+setup_dir(parm.dir_figures)
+setup_dir(parm.dir_image_data)
+
 # Obtain slide IDs
-print("Obtaining slide IDs of {0} data...".format(gene))
+print("Obtaining slide IDs of {0:s} data...".format(gene))
 BCL2_slide_id, cMYC_slide_id, sample_refs = get_spreadsheet_info(
-    "{0}/ALL_REMoDL-B_TMA_{1}_RT.xlsx".format(parm.dir_slide_info, gene))
+    "{0:s}/ALL_REMoDL-B_TMA_{1:s}_RT.xlsx".format(parm.dir_slide_info, gene))
 
 print("BCL-2 slide IDs:   ", BCL2_slide_id[:])
 print("c-Myc slide IDs:   ", cMYC_slide_id[:])
@@ -66,7 +77,8 @@ for slide_id in BCL2_slide_id[:2]:
     for i, c in enumerate(centres):
         print("Sample {0} of {1}".format(i+1, centres.shape[0]), end="\r")
         j, k = extract_sample_images(c, radii[i], mag, parm.image_dim, slide_id,
-        i, parm.dir_image_data, my_slide, parm.greyscale_img, detect_background,
+        i, "{0}/{1}".format(parm.dir_image_data, gene), my_slide,
+        parm.gs_output, detect_background,
         (parm.bg_gs_val, parm.min_bg_area, parm.max_bg_area))
 
         num_images += j

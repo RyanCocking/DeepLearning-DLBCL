@@ -17,4 +17,4 @@ image_dim = 224    # Size of square image for learning data, pixels
 bg_gs_val = 230    # Greyscale value of the slide background colour
 min_bg_area = int(0.01*image_dim**2)    # Pixel area range of background contours
 max_bg_area = int(image_dim**2)         # to detect in square images
-greyscale_img = True    # Use greyscale for deep learning image data
+gs_output = True    # Use greyscale for deep learning image data

@@ -1,22 +1,28 @@
 import openslide as opsl
 import cv2
 import numpy as np
+import sys
 
 import parameters as parm
 from load_slide import get_spreadsheet_info, print_slide_metadata
 from edge_detection import detect_circles, detect_background
 from crop_slides import create_grid, extract_sample_images
 
-# Slide IDs of ABC gene
-print("Obtaining slide IDs of ABC data...")
-abc_BCL2_slide_id, abc_cMYC_slide_id, abc_sample_refs = get_spreadsheet_info(
-    "{0}/ALL_REMoDL-B_TMA_ABC_RT.xlsx".format(parm.dir_slide_data))
+gene = sys.argv[1]
+if gene != "ABC" or gene != "GCB":
+    print("ERROR - Invalid input argument")
+    quit()
 
-print("BCL-2 slide IDs:   ", abc_BCL2_slide_id[:])
-print("")
+# Obtain slide IDs
+print("Obtaining slide IDs of {0} data...".format(gene))
+BCL2_slide_id, cMYC_slide_id, sample_refs = get_spreadsheet_info(
+    "{0}/ALL_REMoDL-B_TMA_{1}_RT.xlsx".format(parm.dir_slide_info, gene))
+
+print("BCL-2 slide IDs:   ", BCL2_slide_id[:])
+print("c-Myc slide IDs:   ", cMYC_slide_id[:])
 
 # Loop over two slides of BCL-2
-for slide_id in abc_BCL2_slide_id[:2]:
+for slide_id in BCL2_slide_id[:2]:
 
     # Pointer to slide object
     print("Opening whole slide object {0}...".format(slide_id))
@@ -60,7 +66,7 @@ for slide_id in abc_BCL2_slide_id[:2]:
     for i, c in enumerate(centres):
         print("Sample {0} of {1}".format(i+1, centres.shape[0]), end="\r")
         j, k = extract_sample_images(c, radii[i], mag, parm.image_dim, slide_id,
-        i, parm.dir_slides_cropped, my_slide, True, detect_background,
+        i, parm.dir_image_data, my_slide, parm.greyscale_img, detect_background,
         (parm.bg_gs_val, parm.min_bg_area, parm.max_bg_area))
 
         num_images += j

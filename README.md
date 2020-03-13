@@ -7,7 +7,7 @@ python >= 3.6.9
 
 apt-get install: openslide-tools
 
-pip install: openslide-python, pandas, xlrd, numpy
+pip install: openslide-python, opencv-python, pandas, xlrd, numpy
 
 LEARNING REQUIREMENTS
 

@@ -13,6 +13,7 @@ test_split = 0.15    # Fraction of data to use in set
 val_split = 0.15
 
 # Training
+test_mode = True   # If True, use a simpler neural net for easy testing
 learning_rate = 1e-4
 batch_size = 32    # No. images to use per gradient update
 epochs = 10    # No. passes through entire dataset

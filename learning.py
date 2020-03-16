@@ -5,6 +5,7 @@ import tensorflow as tf
 import numpy as np
 import dl_parameters as parm
 from dl_routines import sort_images
+from tensorflow.keras.preprocessing.image import img_to_array, load_img
 
 
 path_obj = pathlib.Path(parm.dir_img_data)
@@ -32,12 +33,14 @@ else:
     print("Done") 
 
 
-# The 1./255 is to convert from uint8 to float32 in range [0,1]. Can apply
-# data augmentation here.
-generator = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1.0/255)
+# The 1./255 is to convert from uint8 to float32 in range [0,1]. Apply data
+# augmentation in the form of random horizontal and vertical flips.
+generator = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1.0/255, 
+                                                            horizontal_flip=True, 
+                                                            vertical_flip=True)
 
 # Generate batches of tensor image data, for all images
-print("Loading data as shuffled batches...")
+print("Loading data as shuffled, augmented batches...")
 train_gen = generator.flow_from_directory(directory=parm.dir_train, 
                                           batch_size=parm.batch_size, 
                                           shuffle=True, 
@@ -61,12 +64,15 @@ img_shape = (parm.img_dim, parm.img_dim, 3)
 # Load the pre-trained model without the topmost classification (or 'bottleneck)
 # layers (include_top=False)
 print("Loading pre-trained model...")
-#pre_model = tf.keras.applications.vgg19.VGG19(input_shape=img_shape, 
-#                                              include_top=False, 
-#                                              weights='imagenet')
-pre_model = tf.keras.applications.MobileNetV2(input_shape=img_shape, 
+if parm.test_mode is True:
+    pre_model = tf.keras.applications.MobileNetV2(input_shape=img_shape, 
                                               include_top=False, 
                                               weights='imagenet')
+else:
+    pre_model = tf.keras.applications.vgg19.VGG19(input_shape=img_shape, 
+                                                  include_top=False, 
+                                                  weights='imagenet')
+
 pre_model.summary()
 
 # Freeze the convolutional base of the model prior to compilation and training.
@@ -95,8 +101,8 @@ model.summary()
 print("Running model in evaluation mode...")
 loss, accuracy = model.evaluate(x=val_gen, steps=20)
 
-print("Loss = {0}".format(loss))
-print("Accuracy = {0}".format(accuracy))
+print("Training model...")
+history = model.fit(x=train_gen, epochs=parm.epochs, validation_data=val_gen)
 
 print("Done")
 

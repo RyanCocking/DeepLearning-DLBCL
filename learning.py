@@ -1,12 +1,13 @@
 # Deep learning
 import os
+import sys
 import pathlib
 import tensorflow as tf
 import numpy as np
 import dl_parameters as parm
 from dl_routines import sort_images
 import matplotlib.pyplot as plt
-
+import pickle
 
 path_obj = pathlib.Path(parm.dir_img_data)
 class_names = ["ABC", "GCB"]
@@ -67,10 +68,19 @@ img_shape = (parm.img_dim, parm.img_dim, 3)
 # Load the pre-trained model without the topmost classification (or 'bottleneck)
 # layers (include_top=False)
 print("Loading pre-trained model...")
-pre_model = tf.keras.applications.MobileNetV2(input_shape=img_shape, 
-                                              include_top=False, 
-                                              weights='imagenet')
-pre_model.summary()
+if parm.model_name == "MobileNetV2":
+    pre_model = tf.keras.applications.MobileNetV2(input_shape=img_shape, 
+                                                  include_top=False, 
+                                                  weights='imagenet')
+elif parm.model_name == "VGG19":
+    pre_model = tf.keras.applications.vgg19.VGG19(input_shape=img_shape, 
+                                                  include_top=False, 
+                                                  weights='imagenet')
+else:
+    print("ERROR - Invalid model name. Exiting program.")
+    sys.exit()
+
+# pre_model.summary()
 
 # Freeze the convolutional base of the model, preventing the weights from being
 # updated during training. 
@@ -98,17 +108,21 @@ print("Compiling combined Sequential model...")
 model.compile(optimizer=tf.keras.optimizers.SGD(lr=parm.learning_rate), 
               loss=tf.keras.losses.BinaryCrossentropy(from_logits=True), 
               metrics=['accuracy'])
-model.summary()
+# model.summary()
 
 print("Training model...")
 history = model.fit(x=train_gen, epochs=parm.epochs, validation_data=val_gen)
-print("Saving weights...")
-model.save_weights("modeL_weights.h5")
+
+print("Saving model history and weights...")
+model.save_weights("Weights{0}.h5".format(parm.file_suffix))
+with open("History{0}.pkl".format(parm.file_suffix), 'wb') as f:
+    pickle.dump(history.history, f, pickle.HIGHEST_PROTOCOL)
+    
+# To load: history = pickle.load( open("filename.pkl", "rb") )
 
 print("Plotting results...")
 acc = history.history['accuracy']
 val_acc = history.history['val_accuracy']
-
 loss = history.history['loss']
 val_loss = history.history['val_loss']
 
@@ -129,7 +143,7 @@ plt.ylabel('BXE Loss')
 plt.ylim([0,1.0])
 plt.title('Training and Validation Loss')
 plt.xlabel('Epoch')
-plt.savefig("AccuracyLoss.png", dpi=300)
+plt.savefig("AccuracyLoss{0}.png".format(parm.file_suffix), dpi=300)
 
 print("Done")
 

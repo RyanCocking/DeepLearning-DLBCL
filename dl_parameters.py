@@ -13,7 +13,10 @@ test_split = 0.15    # Fraction of data to use in set
 val_split = 0.15
 
 # Training
-test_mode = True   # If True, use a simpler neural net for easy testing
+model_name = "MobileNetV2"    # Or VGG19
 learning_rate = 1e-4
 batch_size = 32    # No. images to use per gradient update
-epochs = 10    # No. passes through entire dataset
+epochs = 1    # No. passes through entire dataset
+
+file_suffix = "_lr{0:.1e}_bs{1:d}_ep{2:d}_{3:s}".format(learning_rate,
+    batch_size, epochs, model_name)

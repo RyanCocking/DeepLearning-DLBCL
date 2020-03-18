@@ -45,19 +45,22 @@ train_gen = generator.flow_from_directory(directory=parm.dir_train,
                                           batch_size=parm.batch_size, 
                                           shuffle=True, 
                                           target_size=(parm.img_dim, parm.img_dim), 
-                                          classes=list(class_names))
+                                          classes=list(class_names), 
+                                          class_mode='binary')
 
 test_gen = generator.flow_from_directory(directory=parm.dir_test, 
                                          batch_size=parm.batch_size, 
                                          shuffle=True, 
                                          target_size=(parm.img_dim, parm.img_dim), 
-                                         classes=list(class_names))
+                                         classes=list(class_names), 
+                                         class_mode='binary')
 
 val_gen = generator.flow_from_directory(directory=parm.dir_val, 
                                         batch_size=parm.batch_size, 
                                         shuffle=True, 
                                         target_size=(parm.img_dim, parm.img_dim), 
-                                        classes=list(class_names))
+                                        classes=list(class_names), 
+                                        class_mode='binary')
 
 img_shape = (parm.img_dim, parm.img_dim, 3)
 

@@ -92,14 +92,10 @@ model = tf.keras.Sequential(layers=[pre_model, global_average_layer, prediction_
 # Compile the model. Use a binary cross-entropy loss function, since there are
 # only two classes
 print("Compiling combined Sequential model...")
-model.compile(optimizer=tf.keras.optimizers.RMSprop(lr=parm.learning_rate), 
+model.compile(optimizer=tf.keras.optimizers.SGD(lr=parm.learning_rate), 
               loss=tf.keras.losses.BinaryCrossentropy(from_logits=True), 
               metrics=['accuracy'])
 model.summary()
-
-# Run model on validation data in test mode
-print("Running model in evaluation mode...")
-loss, accuracy = model.evaluate(x=val_gen, steps=20)
 
 print("Training model...")
 history = model.fit(x=train_gen, epochs=parm.epochs, validation_data=val_gen)

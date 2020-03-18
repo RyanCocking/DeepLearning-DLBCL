@@ -5,7 +5,7 @@ import tensorflow as tf
 import numpy as np
 import dl_parameters as parm
 from dl_routines import sort_images
-from tensorflow.keras.preprocessing.image import img_to_array, load_img
+import matplotlib.pyplot as plt
 
 
 path_obj = pathlib.Path(parm.dir_img_data)
@@ -67,24 +67,24 @@ img_shape = (parm.img_dim, parm.img_dim, 3)
 # Load the pre-trained model without the topmost classification (or 'bottleneck)
 # layers (include_top=False)
 print("Loading pre-trained model...")
-if parm.test_mode is True:
-    pre_model = tf.keras.applications.MobileNetV2(input_shape=img_shape, 
+pre_model = tf.keras.applications.MobileNetV2(input_shape=img_shape, 
                                               include_top=False, 
                                               weights='imagenet')
-else:
-    pre_model = tf.keras.applications.vgg19.VGG19(input_shape=img_shape, 
-                                                  include_top=False, 
-                                                  weights='imagenet')
-
 pre_model.summary()
 
-# Freeze the convolutional base of the model prior to compilation and training.
-# This prevents weights from being updated during training.
+# Freeze the convolutional base of the model, preventing the weights from being
+# updated during training. 
+#
+# This is especially important given that the base model has many millions of
+# layers, and that we are more interested in using these layers to do some
+# classification rather than train them further.
 pre_model.trainable = False
 
 # Add a classifier to the top of the model. The pooling layer converts features
 # to a 1280-element vector per image, whilst the dense layer converts these
 # features into a single prediction per image.
+#
+# These are the layers that we want to train for image classification.
 global_average_layer = tf.keras.layers.GlobalAveragePooling2D()
 prediction_layer = tf.keras.layers.Dense(1)
 
@@ -102,6 +102,34 @@ model.summary()
 
 print("Training model...")
 history = model.fit(x=train_gen, epochs=parm.epochs, validation_data=val_gen)
+print("Saving weights...")
+model.save_weights("modeL_weights.h5")
+
+print("Plotting results...")
+acc = history.history['accuracy']
+val_acc = history.history['val_accuracy']
+
+loss = history.history['loss']
+val_loss = history.history['val_loss']
+
+plt.figure(figsize=(8, 8))
+plt.subplot(2, 1, 1)
+plt.plot(acc, label='Training')
+plt.plot(val_acc, label='Validation')
+plt.legend(loc='lower right')
+plt.ylabel('Accuracy')
+plt.ylim([min(plt.ylim()),1])
+plt.title('Training and Validation Accuracy')
+
+plt.subplot(2, 1, 2)
+plt.plot(loss, label='Training')
+plt.plot(val_loss, label='Validation')
+plt.legend(loc='upper right')
+plt.ylabel('BXE Loss')
+plt.ylim([0,1.0])
+plt.title('Training and Validation Loss')
+plt.xlabel('Epoch')
+plt.savefig("AccuracyLoss.png", dpi=300)
 
 print("Done")
 

@@ -37,7 +37,8 @@ else:
 
 # The 1./255 is to convert from uint8 to float32 in range [0,1]. Apply data
 # augmentation in the form of random horizontal and vertical flips to training
-# data only.
+# data only. Augmentation is done on-the-fly as the model is trained with the
+# generator.
 aug_gen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1.0/255, 
                                                           horizontal_flip=True, 
                                                           vertical_flip=True)
@@ -45,7 +46,7 @@ aug_gen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1.0/255,
 gen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1.0/255)
 
 # Generate batches of tensor image data, for all images
-print("Loading data as shuffled, augmented batches...")
+print("Loading data as shuffled batches...")
 train_gen = aug_gen.flow_from_directory(directory=parm.dir_train, 
                                           batch_size=parm.batch_size, 
                                           shuffle=True, 
@@ -70,6 +71,7 @@ val_gen = gen.flow_from_directory(directory=parm.dir_val,
 img_shape = (parm.img_dim, parm.img_dim, 3)
 
 # Construct model from pre-trained ConvNet
+times = []
 if not parm.load_model:
     
     print("Constructing classification model from pre-trained ConvNet...")
@@ -82,12 +84,17 @@ if not parm.load_model:
                               validation_data=val_gen)
     end = time.time()
     t = end - start
+    times.append(t)
     print("Training time = {0:.2f} s".format(t))
     
     print("Saving training results and model state...")
     model.save("Model{0}.h5".format(parm.file_suffix))
     with open("TrainingResults{0}.pkl".format(parm.file_suffix), 'wb') as f:
         pickle.dump(train_results.history, f, pickle.HIGHEST_PROTOCOL)
+        
+    print("Saving time...")
+    np.savetxt("Time{0}.txt".format(parm.file_suffix), times, 
+               header = "Training time (s)")
     
 # Load a model previously trained by the code
 elif parm.load_model:
@@ -103,6 +110,7 @@ start = time.time()
 test_results = model.evaluate(x=test_gen, verbose=1)
 end = time.time()
 t = end - start
+times.append(t)
 print("Testing time = {0:.2f} s".format(t))
 
 print("Saving testing results...")
@@ -114,12 +122,13 @@ start = time.time()
 predictions = model.predict(x=test_gen, steps=100, verbose=1)
 end = time.time()
 t = end - start
+times.append(t)
 print("Made {0:d} predictions".format(predictions.shape[0]))
 print("Prediction time = {0:.2f} s".format(t))
 print("Saving predictions...")
 np.savetxt("Predictions{0}.txt".format(parm.file_suffix), predictions,
            header = "{0} class predictions".format(predictions.shape[0]))
-   
+ 
 # Plotting
 print("Plotting results...") 
 if not parm.load_model:   

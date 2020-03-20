@@ -1,4 +1,5 @@
 # Routines for deep learning
+import sys
 import os
 import shutil
 import numpy as np
@@ -95,4 +96,66 @@ def sort_images(img_paths, class_name, dir_train, dir_test, dir_val, test_split,
     move_images(train_paths, dir_train_class)
     move_images(test_paths, dir_test_class)
     move_images(val_paths, dir_val_class)
+    
+def construct_model(model_name, img_shape, learning_rate):
+    """
+    Load a pre-trained convolutional neural network, freeze its trainable layers
+    and add a classifier on top (consisting of an averaging layer and dense
+    layer).
+    
+    Compiled with a Stochastic Gradient Descent optimiser and Binary Cross-Entropy
+    loss function.
+    
+    arguments:
+        model_name: str, the name of the pre-trained ConvNet. So far accepts
+                    MobileNetV2 and VGG19.
+        img_shape: int, the dimensions of the square images that will be passed
+                   to the modek for training. Generalisable to rectangles.
+        learning_rate: float, a hyperparameter that controls the rate of
+                       gradient updates whilst training the model.
+    returns:
+        model: a compiled Keras model, ready to be assigned to training data.
+    """
+    
+    # Load the pre-trained model without its topmost classification layer
+    if model_name == "MobileNetV2":
+        pre_model = tf.keras.applications.MobileNetV2(input_shape=img_shape, 
+                                                      include_top=False, 
+                                                      weights='imagenet')
+    elif model_name == "VGG19":
+        pre_model = tf.keras.applications.vgg19.VGG19(input_shape=img_shape, 
+                                                      include_top=False, 
+                                                      weights='imagenet')
+    else:
+        print("ERROR - Invalid model name. Exiting program.")
+        sys.exit()
+    
+    # Freeze the convolutional base of the model, preventing the weights from being
+    # updated during training. 
+    #
+    # This is especially important given that the base model has many millions of
+    # layers, and that we are more interested in using these layers to do some
+    # classification rather than train them further.
+    pre_model.trainable = False
+    
+    # Add a classifier to the top of the model. The pooling layer converts features
+    # to a 1280-element vector per image, whilst the dense layer converts these
+    # features into a single prediction per image.
+    #
+    # These are the layers that we want to train for image classification.
+    global_average_layer = tf.keras.layers.GlobalAveragePooling2D()
+    prediction_layer = tf.keras.layers.Dense(1)
+    
+    
+    # Stack these layers on top of the VGG model using a Keras sequential model
+    model = tf.keras.Sequential(layers=[pre_model, global_average_layer, 
+                                        prediction_layer])
+        
+    # Compile the model. Use a binary cross-entropy loss function, since there are
+    # only two classes, and a Stochastic Gradient Descent optimiser.
+    model.compile(optimizer=tf.keras.optimizers.SGD(lr=learning_rate), 
+                  loss=tf.keras.losses.BinaryCrossentropy(from_logits=True), 
+                  metrics=['accuracy'])
+    
+    return model
     

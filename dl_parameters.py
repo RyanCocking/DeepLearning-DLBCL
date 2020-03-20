@@ -13,10 +13,11 @@ test_split = 0.15    # Fraction of data to use in set
 val_split = 0.15
 
 # Training
+load_model = True    # Load a model + classifier previously trained by the code
 model_name = "MobileNetV2"    # Or VGG19
-learning_rate = 1e-4
+learning_rate = 1e-3
 batch_size = 32    # No. images to use per gradient update
-epochs = 1    # No. passes through entire dataset
+epochs = 10    # No. passes through entire dataset
 
 file_suffix = "_lr{0:.1e}_bs{1:d}_ep{2:d}_{3:s}".format(learning_rate,
     batch_size, epochs, model_name)

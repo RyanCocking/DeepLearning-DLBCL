@@ -5,15 +5,15 @@ dir_val = dir_img_data + "/val"
 img_dim = 224    # Pixels
 
 # Datasets
-test_split = 0.15    # Fraction of data to use in set
-val_split = 0.15
+test_split = 0.15         # Fraction of data to use in set. NOTE: changing will
+val_split = test_split    # require images to be moved to other directories
 
 # Training
 load_model = False    # Load a model + classifier previously trained by the code
 model_name = "MobileNetV2"    # Or VGG19
-learning_rate = 5e-4
-batch_size = 64    # No. images to use per gradient update
-epochs = 60    # No. passes through entire dataset
+learning_rate = 1e-4
+batch_size = 128    # No. images to use per gradient update
+epochs = 30    # No. passes through entire dataset
 
-file_suffix = "_lr{0:.1e}_bs{1:d}_ep{2:d}_{3:s}".format(learning_rate,
-    batch_size, epochs, model_name)
+file_suffix = "_lr{0:.1e}_bs{1:d}_sp{2:.2f}_{3:s}".format(learning_rate,
+    batch_size, test_split, model_name)

@@ -88,9 +88,9 @@ def sort_images(img_paths, class_name, dir_train, dir_test, dir_val, test_split,
     dir_train_class = "{0}/{1}".format(dir_train, class_name)
     dir_test_class = "{0}/{1}".format(dir_test, class_name)
     dir_val_class = "{0}/{1}".format(dir_val, class_name)
-    make_dir(dir_train)
-    make_dir(dir_test)
-    make_dir(dir_val)
+    make_dir(dir_train_class)
+    make_dir(dir_test_class)
+    make_dir(dir_val_class)
         
     # Move the images to their respective directories
     move_images(train_paths, dir_train_class)

@@ -19,11 +19,9 @@ def get_spreadsheet_info(filename):
         filename: .svs file path
 
     returns:
-        BCL2_slide_id: N int array, 7-digit slide IDs for BCL-2 staining
-        cMYC_slide_id: N int array, 7-digit slide IDs for c-MYC staining
-        sample_refs: NxMx2 list, alphanumeric sample references for N slides
-                   of M samples. Both stains use the same references. Indexed as
-                   [slide, sample, col/row]
+        BCL2_slide_id: int array, 7-digit slide IDs for BCL-2 staining
+        cMYC_slide_id: int array, 7-digit slide IDs for c-MYC staining
+        num_BCL2, num_cMYC: scalars, number of samples over all slides
 
     """
     # Load .xlsx file as a dict of sheets
@@ -33,6 +31,9 @@ def get_spreadsheet_info(filename):
     BCL2_slide_id=[]
     cMYC_slide_id=[]
     sample_refs = []
+
+    num_BCL2 = 0    # Total number of samples in all slides
+    num_cMYC = 0
 
     # sheets within a spreadsheet
     for sheetname in df.keys():
@@ -47,18 +48,25 @@ def get_spreadsheet_info(filename):
         col_b = sheet.columns[1] 
         col_c = sheet.columns[2]
 
-        sample_cols = np.array(sheet[col_c][4:])
-        sample_rows = np.array(sheet[col_b][4:])
+        sample_cols = np.array(sheet[col_c][4:])    # A, B, C, etc
+        BCL2_tumour = np.array(sheet[col_d][4:])    # pathology tumour scores
+        cMYC_tumour = np.array(sheet[col_h][4:])
 
-        # TODO: if sample contains no data or NA, don't append
-        sample_refs.append(np.transpose([sample_cols, sample_rows]))
-      
+        # check columns d and h (tumour scores) for NA entries
         cols, counts = np.unique(sample_cols, return_counts=True)
-        num_samples = np.sum(counts)    # Includes N/A
-        print(num_samples)
+        total_samples = np.sum(counts)    # Includes all N/A entries
 
-    return BCL2_slide_id, cMYC_slide_id, sample_refs
+        entries = np.unique(BCL2_tumour)    # returns nan for non-numerical entry
+        nan_mask = np.isnan(entries.astype('float64'))
+        num_NA = np.count_nonzero(nan_mask) - 4    # All slides bar one have 4 control samples
+        num_BCL2 += total_samples - num_NA
 
+        entries = np.unique(cMYC_tumour)
+        nan_mask = np.isnan(entries.astype('float64'))
+        num_NA = np.count_nonzero(nan_mask) - 4
+        num_cMYC += total_samples - num_NA
+
+    return BCL2_slide_id, cMYC_slide_id, num_BCL2, num_cMYC
 
 
 def print_slide_metadata(slide_object):

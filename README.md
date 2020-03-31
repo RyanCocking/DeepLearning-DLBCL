@@ -1,5 +1,7 @@
 # DeepLearning-DLBCL
-Using deep learning image classification to identify the gene of diffuse large B-cell lymphoma (DLBCL) tissue samples from IHC-stained histopathology slides. Supervised by Professor David R Westhead at the Leeds Institute for Data Analytics, University of Leeds.
+Using a convolutional neural network to identify the activated B-cell-like (ABC) and germinal centre B-cell-like (GCB) classes of diffuse large B-cell lymphoma (DLBCL) IHC-stained histopathology slide images. 
+
+Code initially developed during a first-year PhD rotation project funded by the Wellcome Trust, supervised by Professor David R Westhead at the Leeds Institute for Data Analytics, University of Leeds.
 
 REQUIREMENTS
 

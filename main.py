@@ -15,6 +15,8 @@ def setup_dir(path):
     except FileExistsError:
         pass
 
+# Accept activated B cell-like (ABC) or germinal center B cell-like (GCB)
+# string as input
 gene = sys.argv[1]
 if gene != "ABC" and gene != "GCB":
     print("ERROR - Invalid input argument")

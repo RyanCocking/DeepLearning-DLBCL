@@ -52,11 +52,14 @@ def get_spreadsheet_info(filename):
         BCL2_tumour = np.array(sheet[col_d][4:])    # pathology tumour scores
         cMYC_tumour = np.array(sheet[col_h][4:])
 
-        # check columns d and h (tumour scores) for NA entries
-        cols, counts = np.unique(sample_cols, return_counts=True)
-        total_samples = np.sum(counts)    # Includes all N/A entries
+        # Remove 'nan' strings
+        sample_cols = np.array([x for x in sample_cols if str(x) != 'nan'])
 
-        entries = np.unique(BCL2_tumour)    # returns nan for non-numerical entry
+        # check columns d and h (tumour scores) for 'NA' entries
+        cols, counts = np.unique(sample_cols, return_counts=True)
+        total_samples = np.sum(counts)    # Includes all NA entries
+
+        entries = np.unique(BCL2_tumour)    # returns 'nan' for non-numerical entry
         nan_mask = np.isnan(entries.astype('float64'))
         num_NA = np.count_nonzero(nan_mask) - 4    # All slides bar one have 4 control samples
         num_BCL2 += total_samples - num_NA

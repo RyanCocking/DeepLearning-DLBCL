@@ -5,8 +5,8 @@ import numpy as np
 import math
 import openslide as opsl
 
-def extract_sample_images(centre, radius, mag_factor, img_size, slide_id,
-    sample_ref, dir_path, slide_object, grey_out, bg_func, bg_args):
+def extract_sample_images(centre, radius, mag_factor, img_size, gene, stain,
+    slide_id, sample_ref, dir_path, slide_object, grey_out, bg_func, bg_args):
     """
     Inscribe a square region within a circular sample, then extract square
     images from it.
@@ -48,8 +48,8 @@ def extract_sample_images(centre, radius, mag_factor, img_size, slide_id,
                 discard = bg_func(BGR_img, *bg_args)
 
                 if discard is False:
-                    filename = "id{0}_ref{1}_j{2}_i{3}_output".format(
-                        slide_id, sample_ref, j, i)
+                    filename = "{0}_{1}_id{2}_ref{3}_j{4}_i{5}".format(
+                        gene, stain, slide_id, sample_ref, j, i)
                     if grey_out is True:
                         img = img.convert("LA")
                     img.save("{0}/{1}.png".format(dir_path, filename))

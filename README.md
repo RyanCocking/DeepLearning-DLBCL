@@ -7,9 +7,9 @@ Code initially developed during a first-year PhD rotation project funded by the 
 
 RUNNING
 
-Set directories and constants in `parameters.py`
+Set directories and constants in `parameters.py` and `dl_parameters.py` (soon to be merged)
 
-To generate images, run `python main.py gene_name` with either ABC or GCB as the argument.
+To generate images, run `python main.py gene_name` with either ABC or GCB as the argument
 
 To populate datasets and train a model, run `python learning.py`
 

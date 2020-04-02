@@ -40,6 +40,25 @@ def check_devices():
     print("========================= CHECK COMPLETE =========================")
     print("==================================================================")
 
+def ask_for_overwrite(fname, force_overwrite):
+    if force_overwrite:
+        return True
+    # If path exists, ask user for overwrite permission
+    if os.path.exists(fname):
+        print("File: {0} already exists. Overwrite? (y/n)".format(fname))
+        while True:
+            ow = input()
+            if ow != "y" and ow != "n":
+                print("Please type either 'y' or 'n'.")
+            elif ow == "y":
+                print("Writing file {0}...".format(fname))
+                return True
+            else:
+                print("File not written")
+                return False
+    # OK to write file if path does not exist
+    elif not os.path.exists(fname):
+        return True
 
 def make_dir(path):
     try:
@@ -146,6 +165,7 @@ def construct_model(model_name, img_shape, learning_rate):
     global_average_layer = tf.keras.layers.GlobalAveragePooling2D()
     prediction_layer = tf.keras.layers.Dense(1)
     
+    pre_model.summary()
     
     # Stack these layers on top of the VGG model using a Keras sequential model
     model = tf.keras.Sequential(layers=[pre_model, global_average_layer, 

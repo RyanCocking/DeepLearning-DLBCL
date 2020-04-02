@@ -5,7 +5,7 @@ import pathlib
 import tensorflow as tf
 import numpy as np
 import dl_parameters as parm
-from dl_routines import sort_images, construct_model
+from dl_routines import sort_images, construct_model, ask_for_overwrite
 import matplotlib.pyplot as plt
 import pickle
 import time
@@ -21,7 +21,6 @@ else:
     abc_paths = np.array([str(item) for item in path_obj.glob("ABC/*.png")])
     gcb_paths = np.array([str(item) for item in path_obj.glob("GCB/*.png")])
 
-
 # If the training directory is empty or doesn't exist, begin to move image files
 if os.path.exists(parm.dir_train) and os.path.isdir(parm.dir_train) and os.listdir(parm.dir_train):
     print("Training directory is not empty. Will not move image files.")
@@ -33,7 +32,6 @@ else:
     sort_images(gcb_paths, "GCB", parm.dir_train, parm.dir_test, parm.dir_val, 
                 parm.test_split, parm.val_split)
     print("Done") 
-
 
 # The 1./255 is to convert from uint8 to float32 in range [0,1]. Apply data
 # augmentation in the form of random horizontal and vertical flips to training
@@ -87,14 +85,18 @@ if not parm.load_model:
     times.append(t)
     print("Training time = {0:.2f} s".format(t))
     
-    print("Saving training results and model state...")
-    model.save("Model{0}.h5".format(parm.file_suffix))
-    with open("TrainingResults{0}.pkl".format(parm.file_suffix), 'wb') as f:
-        pickle.dump(train_results.history, f, pickle.HIGHEST_PROTOCOL)
-        
-    print("Saving time...")
-    np.savetxt("Time{0}.txt".format(parm.file_suffix), times, 
-               header = "Training time (s)")
+    # Ask permission to overwrite if file exists. This permission will apply to
+    # all other files created by the code. If file doesn't exist, write anyway.
+    print("Saving mo del state...")
+    fname = "Model{0}.h5".format(parm.file_suffix)
+    allow_ow = ask_for_overwrite(fname, force_overwrite=True)
+    if allow_ow:
+        model.save(fname)
+    
+    print("Saving training results...")
+    if allow_ow:
+        with open("TrainingResults{0}.pkl".format(parm.file_suffix), 'wb') as f:
+            pickle.dump(train_results.history, f, pickle.HIGHEST_PROTOCOL)
     
 # Load a model previously trained by the code
 elif parm.load_model:
@@ -114,8 +116,9 @@ times.append(t)
 print("Testing time = {0:.2f} s".format(t))
 
 print("Saving testing results...")
-np.savetxt("TestingResults{0}.txt".format(parm.file_suffix), test_results,
-           header="Loss, accuracy")
+if allow_ow:
+    np.savetxt("TestingResults{0}.txt".format(parm.file_suffix),
+               test_results, header="Loss, accuracy")
 
 print("Making predictions...")
 start = time.time()
@@ -125,10 +128,17 @@ t = end - start
 times.append(t)
 print("Made {0:d} predictions".format(predictions.shape[0]))
 print("Prediction time = {0:.2f} s".format(t))
+
 print("Saving predictions...")
-np.savetxt("Predictions{0}.txt".format(parm.file_suffix), predictions,
-           header = "{0} class predictions".format(predictions.shape[0]))
+if allow_ow:
+    np.savetxt("Predictions{0}.txt".format(parm.file_suffix), predictions,
+               header = "{0} class predictions".format(predictions.shape[0]))
  
+print("Saving times...")
+if allow_ow:
+    np.savetxt("Times{0}.txt".format(parm.file_suffix), times,
+               header = "Training (unless pre-loaded), testing and prediction times (s)")
+
 # Plotting
 print("Plotting results...") 
 if not parm.load_model:   
@@ -155,7 +165,8 @@ plt.plot(loss, 'b-', label='Train loss')
 plt.plot(val_loss, 'b--', label='Val loss')
 plt.legend(loc='upper right')
 plt.xlabel('Epoch')
-plt.savefig("AccuracyLoss{0}.png".format(parm.file_suffix), dpi=300)
+if allow_ow:
+    plt.savefig("AccuracyLoss{0}.png".format(parm.file_suffix), dpi=300)
 
 print("Done")
     

@@ -5,6 +5,15 @@ The network (MobileNetV2) currently gives poor classification accuracy of around
 
 Code initially developed during a first-year PhD rotation project funded by the Wellcome Trust, supervised by Professor David R Westhead at the Leeds Institute for Data Analytics, University of Leeds.
 
+RUNNING
+
+Set directories and constants in `parameters.py`
+
+To generate images, run `python main.py gene_name` with either ABC or GCB as the argument.
+
+To populate datasets and train a model, run `python learning.py`
+
+
 REQUIREMENTS
 
 python >= 3.6.9
